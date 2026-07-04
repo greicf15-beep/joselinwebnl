@@ -67,33 +67,78 @@ export default function CheckoutModal({ plan, onClose, onPaymentSuccess }: Check
     const message = `🚨 *¡Nuevo pago reportado!*\n\n*Cliente:* ${name}\n*Plan:* ${plan.name} (${plan.price})\n*Método:* ${method.toUpperCase()}\n*Detalles:* ${detailsString}`;
 
     try {
-      await fetch('/api/checkout/telegram', {
+      const token = import.meta.env.TELEGRAM_BOT_TOKEN || import.meta.env.VITE_TELEGRAM_BOT_TOKEN;
+      const chatId = import.meta.env.TELEGRAM_CHAT_ID || import.meta.env.VITE_TELEGRAM_CHAT_ID;
+      
+      if (!token || !chatId) {
+        console.error("Faltan las credenciales de Telegram en Hostinger.");
+        alert("Falta configurar el bot de Telegram en Hostinger.");
+        setStatus('editing');
+        return;
+      }
+
+      const tgUrl = `https://api.telegram.org/bot${token}/sendMessage`;
+      const replyMarkup = {
+        inline_keyboard: [
+          [
+            { text: "✅ Aprobar", callback_data: `approve_${orderId}` },
+            { text: "❌ Rechazar", callback_data: `reject_${orderId}` }
+          ]
+        ]
+      };
+      
+      const sendRes = await fetch(tgUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          orderId,
-          message,
-          details: { name, email, plan: plan.name, method }
+          chat_id: chatId,
+          text: message,
+          parse_mode: 'Markdown',
+          reply_markup: replyMarkup
         })
       });
 
-      // Poll status
+      if (!sendRes.ok) {
+        throw new Error("Failed to send telegram message");
+      }
+
+      // Poll status directly from Telegram API
+      let attempts = 0;
       const pollInterval = setInterval(async () => {
         try {
-          const res = await fetch(`/api/checkout/status/${orderId}`);
-          if (res.ok) {
-            const data = await res.json();
-            if (data.status === 'approved') {
-              clearInterval(pollInterval);
-              setStatus('success');
-            } else if (data.status === 'rejected') {
-              clearInterval(pollInterval);
-              setStatus('editing');
-              alert("El pago fue rechazado. Por favor, verifica los datos e intenta de nuevo.");
+          const updatesRes = await fetch(`https://api.telegram.org/bot${token}/getUpdates`);
+          if (updatesRes.ok) {
+            const data = await updatesRes.json();
+            if (data.ok && data.result) {
+              for (const update of data.result) {
+                if (update.callback_query && update.callback_query.data) {
+                  const cbData = update.callback_query.data;
+                  if (cbData === `approve_${orderId}`) {
+                    clearInterval(pollInterval);
+                    setStatus('success');
+                    fetch(`https://api.telegram.org/bot${token}/answerCallbackQuery?callback_query_id=${update.callback_query.id}`).catch(()=>({}));
+                    return;
+                  } else if (cbData === `reject_${orderId}`) {
+                    clearInterval(pollInterval);
+                    setStatus('editing');
+                    alert("El pago fue rechazado. Por favor, verifica los datos e intenta de nuevo.");
+                    fetch(`https://api.telegram.org/bot${token}/answerCallbackQuery?callback_query_id=${update.callback_query.id}&text=Pago%20Rechazado`).catch(()=>({}));
+                    return;
+                  }
+                }
+              }
             }
           }
         } catch (err) {
           console.error("Error polling:", err);
+        }
+        
+        attempts++;
+        // Stop polling after 15 minutes (450 attempts * 2s)
+        if (attempts > 450) {
+          clearInterval(pollInterval);
+          setStatus('editing');
+          alert("Tiempo de espera agotado. Verifica tu WhatsApp/Correo más tarde.");
         }
       }, 2000);
 
