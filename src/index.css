@@ -1,0 +1,84 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Outfit:wght@100..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  /* Dynamic font-families fallback chain - "Biennale Book" first to respect the mandatory brand font if locally installed */
+  --font-sans: "Biennale Book", "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Biennale Book", "Plus Jakarta Sans", "Outfit", sans-serif;
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  
+  /* Brand-specific custom color variables from the Official manual */
+  --color-brand-burgundy: #30070C;
+  --color-brand-terracotta: #9B655E;
+  --color-brand-rose: #E6A89E;
+  --color-brand-cream: #F5D3C8;
+  --color-brand-bg: #FAF6F5;
+
+  /* Map the entire orange palette so existing classes convert instantly to her brand colors */
+  --color-orange-50: #FAF6F5;
+  --color-orange-100: #F5D3C8;
+  --color-orange-200: #E6A89E;
+  --color-orange-300: #DF978D;
+  --color-orange-400: #B87870;
+  --color-orange-500: #9B655E;
+  --color-orange-600: #84534E;
+  --color-orange-700: #683935;
+  --color-orange-800: #4D2123;
+  --color-orange-900: #30070C;
+  --color-orange-950: #1B0406;
+
+  /* Redefine brand key colors inside brand- namespace */
+  --color-brand-50: #FAF6F5;
+  --color-brand-100: #F5D3C8;
+  --color-brand-200: #E6A89E;
+  --color-brand-350: #DF978D;
+  --color-brand-500: #9B655E;
+  --color-brand-600: #84534E;
+  --color-brand-900: #30070C;
+
+  /* Customize the stone palette to be warm sand/stone for that luxury, editorial look */
+  --color-stone-50: #FCFAF9;
+  --color-stone-100: #F7F1F0;
+  --color-stone-200: #EDE4E3;
+  --color-stone-300: #E0CECC;
+  --color-stone-400: #B5A09E;
+  --color-stone-500: #917C7B;
+  --color-stone-605: #786361;
+  --color-stone-705: #5E4C4B;
+  --color-stone-800: #4F3E3D;
+  --color-stone-900: #332322;
+  --color-stone-950: #1C1111;
+}
+
+@layer base {
+  body {
+    @apply bg-[#FCFAF9] text-[#1C1111] font-sans antialiased selection:bg-[#F5D3C8] selection:text-[#30070C] overflow-x-hidden;
+  }
+}
+
+/* Custom scrollbar animations and layout utilities */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Custom subtle animation keyframes */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+.float-animation {
+  animation: float 4s ease-in-out infinite;
+}

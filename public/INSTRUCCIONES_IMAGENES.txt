@@ -1,0 +1,11 @@
+INSTRUCCIONES PARA AGREGAR LAS FOTOS REALES DE JOSELIN:
+
+Para que las fotos reales de Joselin aparezcan en la página:
+1. Sube tus dos fotos directamente a esta carpeta ("public") usando el explorador de archivos.
+2. Nómbralas exactamente de la siguiente manera:
+   - "joselin_flex.png"  ->  Para la sección principal (Hero / Portada).
+   - "joselin_box.png"   ->  Para la sección "Quién Soy" (About me).
+
+La aplicación está programada con un sistema inteligente de detección:
+- Si las fotos reales están presentes en esta carpeta, se mostrarán de forma automática.
+- Si no están, se utilizarán fotos de stock profesionales de alta gama (Unsplash) para que el diseño nunca se vea roto ni con enlaces caídos.

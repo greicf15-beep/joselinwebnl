@@ -1,0 +1,6 @@
+{
+  "name": "Joselin - Personal Trainer & Recomposición Corporal",
+  "description": "Landing page de conversión y portal de cuestionario personalizado post-pago para asesoría de recomposición corporal femenina por la coach Joselin.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
