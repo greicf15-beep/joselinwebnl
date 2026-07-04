@@ -126,7 +126,7 @@ export default function HeroSection({ onStartClick }: HeroSectionProps) {
                     }
                   }}
                   alt="Joselin Personal Trainer Crouch" 
-                  className="-mb-[63px] sm:-mb-[14px] max-h-[105%] max-w-[100%] lg:max-h-full lg:max-w-full object-contain select-none filter drop-shadow-[0_20px_50px_rgba(230,168,158,0.25)] transition-all duration-700 scale-110 lg:scale-102 hover:scale-115 lg:hover:scale-105 origin-bottom"
+                  className="-mb-[185px] sm:-mb-[14px] max-h-[120%] sm:max-h-[105%] max-w-[110%] sm:max-w-[100%] lg:max-h-full lg:max-w-full object-contain select-none filter drop-shadow-[0_20px_50px_rgba(230,168,158,0.25)] transition-all duration-700 scale-[1.25] sm:scale-110 lg:scale-102 hover:scale-[1.3] sm:hover:scale-115 lg:hover:scale-105 origin-bottom"
                   style={{ paddingLeft: '0px', paddingTop: 0, paddingBottom: 140, marginTop: '0px', marginRight: '0px' }}
                   referrerPolicy="no-referrer"
                   id="hero-trainer-silhouette"
@@ -134,7 +134,7 @@ export default function HeroSection({ onStartClick }: HeroSectionProps) {
 
                 {/* Floating Glassmorphism Badge */}
                 <div 
-                  className="absolute bottom-6 right-6 sm:bottom-8 sm:right-8 bg-[#30070C]/80 backdrop-blur-md border border-white/10 px-4 py-3 rounded-2xl shadow-xl flex items-center gap-2.5 max-w-[200px]"
+                  className="-mb-[21px] sm:mb-0 absolute bottom-6 right-6 sm:bottom-8 sm:right-8 bg-[#30070C]/80 backdrop-blur-md border border-white/10 px-4 py-3 rounded-2xl shadow-xl flex items-center gap-2.5 max-w-[200px]"
                   id="floating-coach-badge"
                 >
                   <div className="w-8 h-8 rounded-full bg-[#E6A89E] flex items-center justify-center shrink-0">
