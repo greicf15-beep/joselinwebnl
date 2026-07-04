@@ -67,7 +67,7 @@ export default function CheckoutModal({ plan, onClose, onPaymentSuccess }: Check
     const message = `🚨 *¡Nuevo pago reportado!*\n\n*Cliente:* ${name}\n*Plan:* ${plan.name} (${plan.price})\n*Método:* ${method.toUpperCase()}\n*Detalles:* ${detailsString}`;
 
     try {
-      await fetch('/api/checkout/telegram', {
+      const response = await fetch('/api/checkout/telegram', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -77,13 +77,16 @@ export default function CheckoutModal({ plan, onClose, onPaymentSuccess }: Check
         })
       });
 
-      // Poll status
+      if (!response.ok) {
+        throw new Error("Failed to send telegram message via backend");
+      }
+
+      // Poll status from our backend
       let attempts = 0;
       const pollInterval = setInterval(async () => {
         try {
           const res = await fetch(`/api/checkout/status/${orderId}`);
           
-          // Check if response is JSON
           const contentType = res.headers.get("content-type");
           if (contentType && contentType.includes("application/json")) {
             if (res.ok) {
@@ -101,7 +104,7 @@ export default function CheckoutModal({ plan, onClose, onPaymentSuccess }: Check
         } catch (err) {
           console.error("Error polling:", err);
         }
-
+        
         attempts++;
         if (attempts > 450) {
           clearInterval(pollInterval);
