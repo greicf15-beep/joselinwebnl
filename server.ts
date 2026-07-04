@@ -80,19 +80,10 @@ async function startServer() {
   app.post("/api/checkout/telegram", async (req, res) => {
     const { orderId, message, details } = req.body;
     
-    // Default to a simulation mode if no tokens are configured
+    // Return error if no tokens are configured
     if (!telegramBotToken || !telegramChatId) {
-      console.log("No Telegram config found. Simulating approval...");
-      orders.set(orderId, { status: 'pending', details });
-      
-      // Auto-approve after 4 seconds in dev simulation
-      setTimeout(() => {
-        if (orders.has(orderId)) {
-          orders.get(orderId)!.status = 'approved';
-        }
-      }, 4000);
-      
-      return res.json({ success: true, simulated: true });
+      console.error("No Telegram config found on server.");
+      return res.status(500).json({ error: "Telegram config missing" });
     }
 
     orders.set(orderId, { status: 'pending', details });
