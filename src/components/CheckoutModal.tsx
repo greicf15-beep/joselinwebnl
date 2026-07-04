@@ -106,23 +106,55 @@ export default function CheckoutModal({ plan, onClose, onPaymentSuccess }: Check
       let attempts = 0;
       const pollInterval = setInterval(async () => {
         try {
-          const updatesRes = await fetch(`https://api.telegram.org/bot${token}/getUpdates`);
+          // Use POST to avoid mobile browser caching the GET request
+          const updatesRes = await fetch(`https://api.telegram.org/bot${token}/getUpdates`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ allowed_updates: ["callback_query"] })
+          });
+          
           if (updatesRes.ok) {
             const data = await updatesRes.json();
             if (data.ok && data.result) {
               for (const update of data.result) {
                 if (update.callback_query && update.callback_query.data) {
                   const cbData = update.callback_query.data;
-                  if (cbData === `approve_${orderId}`) {
+                  if (cbData === `approve_${orderId}` || cbData === `reject_${orderId}`) {
                     clearInterval(pollInterval);
-                    setStatus('success');
-                    fetch(`https://api.telegram.org/bot${token}/answerCallbackQuery?callback_query_id=${update.callback_query.id}`).catch(()=>({}));
-                    return;
-                  } else if (cbData === `reject_${orderId}`) {
-                    clearInterval(pollInterval);
-                    setStatus('editing');
-                    alert("El pago fue rechazado. Por favor, verifica los datos e intenta de nuevo.");
-                    fetch(`https://api.telegram.org/bot${token}/answerCallbackQuery?callback_query_id=${update.callback_query.id}&text=Pago%20Rechazado`).catch(()=>({}));
+                    
+                    const isApproved = cbData === `approve_${orderId}`;
+                    const msgId = update.callback_query.message?.message_id;
+                    
+                    // Answer the callback so the button stops loading in Telegram
+                    await fetch(`https://api.telegram.org/bot${token}/answerCallbackQuery`, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ 
+                        callback_query_id: update.callback_query.id, 
+                        text: isApproved ? 'Pago Aprobado ✅' : 'Pago Rechazado ❌' 
+                      })
+                    }).catch(()=>({}));
+
+                    // Edit the message to remove buttons and show the final status to the admin
+                    if (msgId) {
+                      await fetch(`https://api.telegram.org/bot${token}/editMessageText`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                          chat_id: chatId, 
+                          message_id: msgId, 
+                          text: message + (isApproved ? '\n\n✅ *APROBADO*' : '\n\n❌ *RECHAZADO*'),
+                          parse_mode: 'Markdown'
+                        })
+                      }).catch(()=>({}));
+                    }
+                    
+                    if (isApproved) {
+                      setStatus('success');
+                    } else {
+                      setStatus('editing');
+                      alert("El pago fue rechazado. Por favor, verifica los datos e intenta de nuevo.");
+                    }
                     return;
                   }
                 }
@@ -474,6 +506,12 @@ export default function CheckoutModal({ plan, onClose, onPaymentSuccess }: Check
                 <p className="text-sm text-neutral-600 max-w-sm leading-relaxed mx-auto">
                   Este proceso puede tomar un par de minutos. En cuanto confirmemos, tu portal diagnóstico se desbloqueará automáticamente.
                 </p>
+                <div className="mt-6 bg-amber-50 border border-amber-200 text-amber-800 text-xs px-4 py-3 rounded-lg max-w-sm text-left flex gap-3 items-start">
+                  <span className="text-amber-500 mt-0.5">⚠️</span>
+                  <p>
+                    <strong>¡Importante!</strong> Por favor no cierres esta página, no cambies de pestaña ni apagues la pantalla de tu celular hasta que recibas la confirmación.
+                  </p>
+                </div>
               </motion.div>
             )}
 
