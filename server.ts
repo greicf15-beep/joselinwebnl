@@ -12,7 +12,6 @@ let telegramChatId = process.env.TELEGRAM_CHAT_ID;
 
 // Polling for Telegram Updates
 let lastUpdateId = 0;
-
 async function pollTelegram() {
   if (!telegramBotToken) return;
 
@@ -31,19 +30,21 @@ async function pollTelegram() {
           const callbackQueryId = update.callback_query.id;
           const messageId = update.callback_query.message?.message_id;
 
-          if (callbackData.startsWith('approve_')) {
-            const orderId = callbackData.replace('approve_', '');
+          if (callbackData.startsWith('approve_') || callbackData.startsWith('reject_')) {
+            const isApproved = callbackData.startsWith('approve_');
+            const orderId = callbackData.replace(isApproved ? 'approve_' : 'reject_', '');
+
             if (orders.has(orderId)) {
-              orders.get(orderId)!.status = 'approved';
+              orders.get(orderId)!.status = isApproved ? 'approved' : 'rejected';
               
               // Answer callback query
               await fetch(`https://api.telegram.org/bot${telegramBotToken}/answerCallbackQuery`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ callback_query_id: callbackQueryId, text: 'Pago Aprobado ✅' })
+                body: JSON.stringify({ callback_query_id: callbackQueryId, text: isApproved ? 'Pago Aprobado ✅' : 'Pago Rechazado ❌' })
               });
 
-              // Edit the original message to remove buttons and show approved status
+              // Edit the original message to remove buttons and show approved/rejected status
               if (messageId) {
                 await fetch(`https://api.telegram.org/bot${telegramBotToken}/editMessageText`, {
                   method: 'POST',
@@ -51,7 +52,7 @@ async function pollTelegram() {
                   body: JSON.stringify({
                     chat_id: telegramChatId,
                     message_id: messageId,
-                    text: update.callback_query.message.text + '\n\n✅ APROBADO'
+                    text: update.callback_query.message.text + (isApproved ? '\n\n✅ APROBADO' : '\n\n❌ RECHAZADO')
                   })
                 });
               }
@@ -107,7 +108,8 @@ async function startServer() {
           reply_markup: {
             inline_keyboard: [
               [
-                { text: '✅ Aprobar', callback_data: `approve_${orderId}` }
+                { text: '✅ Aprobar', callback_data: `approve_${orderId}` },
+                { text: '❌ Rechazar', callback_data: `reject_${orderId}` }
               ]
             ]
           }
