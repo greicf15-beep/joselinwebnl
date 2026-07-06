@@ -77,23 +77,42 @@ export default function CheckoutModal({ plan, onClose, onPaymentSuccess }: Check
 
       const finalMessage = message + "\n\n----------------------------------\nPara aprobar y enviar el enlace de acceso al cliente, haz clic en el botón de abajo.";
 
-      // Clean whatsapp number (remove spaces, +, etc to ensure wa.me link works)
-      const cleanWa = whatsapp.replace(/\D/g,'');
+      // Formatear el número de WhatsApp (asumimos Venezuela si empieza por 04)
+      let cleanWa = whatsapp.replace(/\D/g,'');
+      if (cleanWa.startsWith('0') && cleanWa.length === 11) {
+        cleanWa = '58' + cleanWa.substring(1);
+      } else if (cleanWa.length === 10 && cleanWa.startsWith('4')) {
+        cleanWa = '58' + cleanWa;
+      }
+      
       const waMessage = `¡Hola ${name}! Tu pago del plan ${plan.name} ha sido aprobado con éxito ✅. Aquí tienes tu enlace de acceso único para iniciar tu proceso: \n\n${accessLink}`;
-      const waUrl = `https://wa.me/${cleanWa}?text=${encodeURIComponent(waMessage)}`;
+      const waUrl = `https://api.whatsapp.com/send?phone=${cleanWa}&text=${encodeURIComponent(waMessage)}`;
+      const waFallbackUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(waMessage)}`;
+
+      const textWithLinks = finalMessage + 
+        "\n\n✅ *Opcion 1:* Enviar a " + cleanWa +
+        "\n" + waUrl +
+        "\n\n⚠️ *Opcion 2:* Si el enlace anterior da error (número inválido), usa este y selecciona el contacto manualmente:" +
+        "\n" + waFallbackUrl;
 
       const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           chat_id: chatId,
-          text: finalMessage,
+          text: textWithLinks,
           reply_markup: {
             inline_keyboard: [
               [
                 {
-                  text: "✅ Aprobar y Enviar WhatsApp",
+                  text: "✅ Enviar WhatsApp Directo",
                   url: waUrl
+                }
+              ],
+              [
+                {
+                  text: "⚠️ Enviar Manual (si falla el directo)",
+                  url: waFallbackUrl
                 }
               ]
             ]
