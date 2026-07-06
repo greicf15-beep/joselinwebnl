@@ -7,6 +7,8 @@ interface QuestionnaireFormProps {
 }
 
 export default function QuestionnaireForm({ purchaseData }: QuestionnaireFormProps) {
+  const [name, setName] = useState(purchaseData?.name || '');
+  const [email, setEmail] = useState(purchaseData?.email || '');
   const [age, setAge] = useState('');
   const [weight, setWeight] = useState('');
   const [height, setHeight] = useState('');
@@ -89,6 +91,39 @@ export default function QuestionnaireForm({ purchaseData }: QuestionnaireFormPro
           </div>
 
           <form onSubmit={handleSubmit} className="p-8 space-y-8">
+            {!purchaseData && (
+              <div className="space-y-4">
+                <h3 className="text-sm font-bold uppercase tracking-widest text-neutral-800 flex items-center gap-2">
+                  <User className="w-4 h-4 text-[#E6A89E]" />
+                  Tus Datos
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-neutral-600 mb-1">Nombre Completo</label>
+                    <input
+                      type="text"
+                      required
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="w-full px-4 py-3 rounded-xl border border-neutral-200 focus:border-neutral-900 focus:outline-none transition-all"
+                      placeholder="Ej: Ana María"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-neutral-600 mb-1">Correo Electrónico</label>
+                    <input
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full px-4 py-3 rounded-xl border border-neutral-200 focus:border-neutral-900 focus:outline-none transition-all"
+                      placeholder="Ej: ana@email.com"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+            
             {/* Medidas Básicas */}
             <div className="space-y-4">
               <h3 className="text-sm font-bold uppercase tracking-widest text-neutral-800 flex items-center gap-2">

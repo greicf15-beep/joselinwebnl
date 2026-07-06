@@ -22,6 +22,12 @@ export default function App() {
 
   // Check for access token in URL (from Joselin's approval link)
   useEffect(() => {
+    // Si la URL tiene /formulario, mostramos el cuestionario directamente
+    if (window.location.pathname.startsWith('/formulario')) {
+      setView('questionnaire');
+      return;
+    }
+
     const params = new URLSearchParams(window.location.search);
     const access = params.get('access');
     const shortAccess = params.get('a');

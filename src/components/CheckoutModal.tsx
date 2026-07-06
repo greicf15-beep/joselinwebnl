@@ -83,9 +83,8 @@ export default function CheckoutModal({ plan, onClose, onPaymentSuccess }: Check
         cleanWa = '58' + cleanWa;
       }
       
-      // ACORTAMOS EL ENLACE PARA QUE NO FALLE TELEGRAM NI WHATSAPP
-      const shortPayload = btoa(encodeURIComponent(JSON.stringify([name, email, plan.name])));
-      const shortAccessLink = `https://joselinnextlevel.com/?a=${shortPayload}`;
+      // Usar enlace de formulario limpio y universal
+      const shortAccessLink = `https://joselinnextlevel.com/formulario`;
 
       const waMessage = `¡Hola ${name}! Tu pago del plan ${plan.name} ha sido aprobado con éxito ✅. Aquí tienes tu enlace de acceso único para iniciar tu proceso: \n\n${shortAccessLink}`;
       const waUrl = `https://wa.me/${cleanWa}?text=${encodeURIComponent(waMessage)}`;
