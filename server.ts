@@ -34,21 +34,23 @@ async function startServer() {
         "Copia el siguiente enlace y envíaselo al cliente por WhatsApp o Correo para que inicie su cuestionario:\n\n" +
         accessLink;
 
+      console.log("Sending message to Telegram...");
       const response = await fetch(`https://api.telegram.org/bot${telegramBotToken}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           chat_id: telegramChatId,
-          text: finalMessage,
-          parse_mode: 'HTML' // o sin parse_mode para evitar errores de markdown
+          text: finalMessage
         })
       });
       
       const data = await response.json();
       if (!data.ok) {
+        console.error("Telegram API Error:", data);
         throw new Error(data.description);
       }
       
+      console.log("Message sent to Telegram successfully.");
       res.json({ success: true });
     } catch (error: any) {
       console.error("Error sending to Telegram:", error);
