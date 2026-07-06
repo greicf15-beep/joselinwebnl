@@ -27,7 +27,7 @@ export default function CheckoutModal({ plan, onClose, onPaymentSuccess }: Check
 
   const [copiedField, setCopiedField] = useState<string | null>(null);
   
-  const [status, setStatus] = useState<'editing' | 'processing' | 'success'>('editing');
+  const [status, setStatus] = useState<'editing' | 'processing' | 'success' | 'submitted'>('editing');
 
   // Helper to copy text
   const copyToClipboard = (text: string, fieldId: string) => {
@@ -67,122 +67,23 @@ export default function CheckoutModal({ plan, onClose, onPaymentSuccess }: Check
     const message = `🚨 *¡Nuevo pago reportado!*\n\n*Cliente:* ${name}\n*Plan:* ${plan.name} (${plan.price})\n*Método:* ${method.toUpperCase()}\n*Detalles:* ${detailsString}`;
 
     try {
-      const token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN || "7243911516:AAF89R3c0wQz3VrtYvR9wW76U2Q_xYtq11w";
-      const chatId = import.meta.env.VITE_TELEGRAM_CHAT_ID || "-1002347206016";
+      const response = await fetch('/api/checkout/telegram', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderId,
+          message,
+          details: { name, email, plan: plan.name, method }
+        })
+      });
       
-      const tgUrl = `https://api.telegram.org/bot${token}/sendMessage`;
-      const replyMarkup = {
-        inline_keyboard: [
-          [
-            { text: "✅ Aprobar", callback_data: `approve_${orderId}` },
-            { text: "❌ Rechazar", callback_data: `reject_${orderId}` }
-          ]
-        ]
-      };
-      
-      let useSimulation = false;
-
-      try {
-        const sendRes = await fetch(tgUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: chatId,
-            text: message,
-            parse_mode: 'Markdown',
-            reply_markup: replyMarkup
-          })
-        });
-
-        if (!sendRes.ok) {
-          console.warn("Telegram API falló (posible token inválido). Cambiando a modo simulación.");
-          useSimulation = true;
-        }
-      } catch (e) {
-        console.warn("Fallo de red al contactar Telegram. Cambiando a modo simulación.");
-        useSimulation = true;
+      if (!response.ok) {
+        throw new Error("Error al comunicarse con el servidor.");
       }
 
-      if (useSimulation) {
-        // SIMULATION MODE
-        console.log("Simulando aprobación de pago en 4 segundos...");
-        setTimeout(() => {
-          setStatus('success');
-        }, 4000);
-        return;
-      }
-
-      // Hacemos polling directo a Telegram para ver si el administrador presiona el botón
-      let attempts = 0;
-      let lastUpdateId = 0;
-      const pollInterval = setInterval(async () => {
-        try {
-          const updatesRes = await fetch(`https://api.telegram.org/bot${token}/getUpdates`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ allowed_updates: ["callback_query"], offset: lastUpdateId + 1 })
-          });
-          
-          if (updatesRes.ok) {
-            const data = await updatesRes.json();
-            if (data.ok && data.result) {
-              for (const update of data.result) {
-                lastUpdateId = update.update_id;
-                if (update.callback_query && update.callback_query.data) {
-                  const cbData = update.callback_query.data;
-                  if (cbData === `approve_${orderId}` || cbData === `reject_${orderId}`) {
-                    clearInterval(pollInterval);
-                    
-                    const isApproved = cbData === `approve_${orderId}`;
-                    const msgId = update.callback_query.message?.message_id;
-                    
-                    // Respondemos al callback de Telegram
-                    await fetch(`https://api.telegram.org/bot${token}/answerCallbackQuery`, {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ 
-                        callback_query_id: update.callback_query.id, 
-                        text: isApproved ? 'Pago Aprobado ✅' : 'Pago Rechazado ❌' 
-                      })
-                    }).catch(()=>({}));
-
-                    // Editamos el mensaje original para quitar los botones
-                    if (msgId) {
-                      await fetch(`https://api.telegram.org/bot${token}/editMessageText`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ 
-                          chat_id: chatId, 
-                          message_id: msgId, 
-                          text: message + (isApproved ? '\n\n✅ *APROBADO*' : '\n\n❌ *RECHAZADO*'),
-                          parse_mode: 'Markdown'
-                        })
-                      }).catch(()=>({}));
-                    }
-                    
-                    if (isApproved) {
-                      setStatus('success');
-                    } else {
-                      setStatus('editing');
-                      alert("El pago fue rechazado. Por favor, verifica los datos e intenta de nuevo.");
-                    }
-                    return;
-                  }
-                }
-              }
-            }
-          }
-        } catch (err) {
-          console.error("Error polling Telegram API directly:", err);
-        }
-        
-        attempts++;
-        if (attempts > 900) { // ~30 minutos
-          clearInterval(pollInterval);
-          setStatus('editing');
-          alert("Tiempo de espera agotado. Verificaremos tu pago y te contactaremos más tarde.");
-        }
-      }, 2000);
+      // No esperamos la aprobacion en vivo.
+      // Simplemente le mostramos al usuario que ya se envio.
+      setStatus('submitted');
 
     } catch (err: any) {
       console.error(err);
@@ -536,11 +437,46 @@ export default function CheckoutModal({ plan, onClose, onPaymentSuccess }: Check
                 <div className="w-20 h-20 bg-[#30070C] rounded-full text-white flex items-center justify-center mb-6">
                   <Check className="w-10 h-10" />
                 </div>
-                
-                <h4 className="font-display font-black text-3xl text-[#30070C] mb-3">¡Pago Aprobado!</h4>
-                <p className="text-sm text-neutral-600 max-w-sm leading-relaxed">
-                  Redirigiéndote al formulario diagnóstico para configurar tu plan...
+                <h2 className="text-3xl font-display font-black text-neutral-900 tracking-tight mb-2">
+                  ¡Pago Aprobado!
+                </h2>
+                <p className="text-neutral-500 max-w-sm mx-auto mb-8">
+                  Tu pago ha sido validado exitosamente. Redirigiendo a tu portal...
                 </p>
+              </motion.div>
+            )}
+
+            {status === 'submitted' && (
+              <motion.div 
+                key="submitted"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="py-16 flex flex-col items-center justify-center text-center px-6"
+              >
+                <div className="w-20 h-20 bg-[#30070C] rounded-full text-white flex items-center justify-center mb-6">
+                  <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                </div>
+                <h2 className="text-3xl font-display font-black text-neutral-900 tracking-tight mb-4">
+                  ¡Registro Exitoso!
+                </h2>
+                <p className="text-neutral-600 max-w-sm mx-auto mb-6 text-lg">
+                  Hemos recibido los datos de tu pago correctamente.
+                </p>
+                <div className="bg-orange-50 border border-orange-100 p-6 rounded-2xl text-left max-w-md mx-auto shadow-sm">
+                  <p className="text-orange-900 font-medium mb-2 flex items-center">
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    Siguiente paso:
+                  </p>
+                  <p className="text-orange-800 text-sm leading-relaxed">
+                    Joselin validará tu transferencia a la brevedad posible. Una vez aprobada, recibirás tu <b>enlace de acceso único</b> por WhatsApp o Correo para iniciar tu proceso.
+                  </p>
+                </div>
+                <button
+                  onClick={onClose}
+                  className="mt-8 px-8 py-4 bg-neutral-900 text-white rounded-full font-bold uppercase tracking-wider text-sm hover:bg-[#30070C] transition-colors"
+                >
+                  Entendido, cerrar ventana
+                </button>
               </motion.div>
             )}
 
