@@ -67,39 +67,102 @@ export default function CheckoutModal({ plan, onClose, onPaymentSuccess }: Check
     const message = `🚨 *¡Nuevo pago reportado!*\n\n*Cliente:* ${name}\n*Plan:* ${plan.name} (${plan.price})\n*Método:* ${method.toUpperCase()}\n*Detalles:* ${detailsString}`;
 
     try {
-      const response = await fetch('/api/checkout/telegram', {
+      const token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN || "7243911516:AAF89R3c0wQz3VrtYvR9wW76U2Q_xYtq11w";
+      const chatId = import.meta.env.VITE_TELEGRAM_CHAT_ID || "-1002347206016";
+      
+      if (!token || !chatId) {
+        alert("Falta configurar el bot de Telegram.");
+        setStatus('editing');
+        return;
+      }
+
+      const tgUrl = `https://api.telegram.org/bot${token}/sendMessage`;
+      const replyMarkup = {
+        inline_keyboard: [
+          [
+            { text: "✅ Aprobar", callback_data: `approve_${orderId}` },
+            { text: "❌ Rechazar", callback_data: `reject_${orderId}` }
+          ]
+        ]
+      };
+      
+      const sendRes = await fetch(tgUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          orderId,
-          message,
-          details: { name, email, plan: plan.name, method }
+          chat_id: chatId,
+          text: message,
+          parse_mode: 'Markdown',
+          reply_markup: replyMarkup
         })
       });
-      
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || "Error al comunicarse con el servidor.");
+
+      if (!sendRes.ok) {
+        throw new Error("Error al enviar el mensaje a Telegram.");
       }
 
-      // Si el envío fue exitoso, empezamos a hacer polling para ver si lo aprueban
+      // Hacemos polling directo a Telegram para ver si el administrador presiona el botón
       let attempts = 0;
+      let lastUpdateId = 0;
       const pollInterval = setInterval(async () => {
         try {
-          const res = await fetch(`/api/checkout/status/${orderId}`);
-          if (res.ok) {
-            const data = await res.json();
-            if (data.status === 'approved') {
-              clearInterval(pollInterval);
-              setStatus('success');
-            } else if (data.status === 'rejected') {
-              clearInterval(pollInterval);
-              setStatus('editing');
-              alert("El pago fue rechazado. Por favor, verifica los datos e intenta de nuevo.");
+          const updatesRes = await fetch(`https://api.telegram.org/bot${token}/getUpdates`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ allowed_updates: ["callback_query"], offset: lastUpdateId + 1 })
+          });
+          
+          if (updatesRes.ok) {
+            const data = await updatesRes.json();
+            if (data.ok && data.result) {
+              for (const update of data.result) {
+                lastUpdateId = update.update_id;
+                if (update.callback_query && update.callback_query.data) {
+                  const cbData = update.callback_query.data;
+                  if (cbData === `approve_${orderId}` || cbData === `reject_${orderId}`) {
+                    clearInterval(pollInterval);
+                    
+                    const isApproved = cbData === `approve_${orderId}`;
+                    const msgId = update.callback_query.message?.message_id;
+                    
+                    // Respondemos al callback de Telegram
+                    await fetch(`https://api.telegram.org/bot${token}/answerCallbackQuery`, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ 
+                        callback_query_id: update.callback_query.id, 
+                        text: isApproved ? 'Pago Aprobado ✅' : 'Pago Rechazado ❌' 
+                      })
+                    }).catch(()=>({}));
+
+                    // Editamos el mensaje original para quitar los botones
+                    if (msgId) {
+                      await fetch(`https://api.telegram.org/bot${token}/editMessageText`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                          chat_id: chatId, 
+                          message_id: msgId, 
+                          text: message + (isApproved ? '\n\n✅ *APROBADO*' : '\n\n❌ *RECHAZADO*'),
+                          parse_mode: 'Markdown'
+                        })
+                      }).catch(()=>({}));
+                    }
+                    
+                    if (isApproved) {
+                      setStatus('success');
+                    } else {
+                      setStatus('editing');
+                      alert("El pago fue rechazado. Por favor, verifica los datos e intenta de nuevo.");
+                    }
+                    return;
+                  }
+                }
+              }
             }
           }
         } catch (err) {
-          console.error("Error polling backend:", err);
+          console.error("Error polling Telegram API directly:", err);
         }
         
         attempts++;
