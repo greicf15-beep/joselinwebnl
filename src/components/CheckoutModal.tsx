@@ -15,6 +15,7 @@ export default function CheckoutModal({ plan, onClose, onPaymentSuccess }: Check
   const [method, setMethod] = useState<PaymentMethod>('zelle');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [whatsapp, setWhatsapp] = useState('');
   
   // Specific fields
   const [zelleHolder, setZelleHolder] = useState('');
@@ -49,8 +50,8 @@ export default function CheckoutModal({ plan, onClose, onPaymentSuccess }: Check
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !email) {
-      alert("Por favor ingresa tu nombre y correo.");
+    if (!name || !email || !whatsapp) {
+      alert("Por favor ingresa tu nombre, correo y número de WhatsApp.");
       return;
     }
     
@@ -64,7 +65,7 @@ export default function CheckoutModal({ plan, onClose, onPaymentSuccess }: Check
     else if (method === 'pagomovil') detailsString = `Pago Móvil: Banco ${pmBank}, Ref ${pmReference}`;
     else if (method === 'paypal') detailsString = `PayPal: Correo Origen ${paypalEmail}, Ref ${paypalTxid}`;
 
-    const message = `🚨 *¡Nuevo pago reportado!*\n\n*Cliente:* ${name}\n*Plan:* ${plan.name} (${plan.price})\n*Método:* ${method.toUpperCase()}\n*Detalles:* ${detailsString}`;
+    const message = `🚨 *¡Nuevo pago reportado!*\n\n*Cliente:* ${name}\n*WhatsApp:* ${whatsapp}\n*Plan:* ${plan.name} (${plan.price})\n*Método:* ${method.toUpperCase()}\n*Detalles:* ${detailsString}`;
 
     try {
       // Fetch directamente desde el cliente para compatibilidad con hosting estático (ej. Vercel)
@@ -74,18 +75,29 @@ export default function CheckoutModal({ plan, onClose, onPaymentSuccess }: Check
       const payload = btoa(encodeURIComponent(JSON.stringify({ name, email, plan: plan.name, method })));
       const accessLink = `https://joselinnextlevel.com/?access=${payload}`;
 
-      const finalMessage = message + 
-        "\n\n----------------------------------\n" +
-        "✅ SI EL PAGO ES CORRECTO:\n" +
-        "Copia el siguiente enlace y envíaselo al cliente por WhatsApp o Correo para que inicie su cuestionario:\n\n" +
-        accessLink;
+      const finalMessage = message + "\n\n----------------------------------\nPara aprobar y enviar el enlace de acceso al cliente, haz clic en el botón de abajo.";
+
+      // Clean whatsapp number (remove spaces, +, etc to ensure wa.me link works)
+      const cleanWa = whatsapp.replace(/\D/g,'');
+      const waMessage = `¡Hola ${name}! Tu pago del plan ${plan.name} ha sido aprobado con éxito ✅. Aquí tienes tu enlace de acceso único para iniciar tu proceso: \n\n${accessLink}`;
+      const waUrl = `https://wa.me/${cleanWa}?text=${encodeURIComponent(waMessage)}`;
 
       const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           chat_id: chatId,
-          text: finalMessage
+          text: finalMessage,
+          reply_markup: {
+            inline_keyboard: [
+              [
+                {
+                  text: "✅ Aprobar y Enviar WhatsApp",
+                  url: waUrl
+                }
+              ]
+            ]
+          }
         })
       });
       
@@ -289,6 +301,15 @@ export default function CheckoutModal({ plan, onClose, onPaymentSuccess }: Check
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="Tu Correo Electrónico"
+                        className="w-full px-4 py-3 rounded-xl border border-neutral-200 focus:border-neutral-900 focus:outline-none text-sm transition-all bg-white"
+                      />
+                    </div>\n                    <div className="sm:col-span-2">
+                      <input 
+                        type="tel" 
+                        required
+                        value={whatsapp}
+                        onChange={(e) => setWhatsapp(e.target.value)}
+                        placeholder="Tu WhatsApp (ej. +584141234567)"
                         className="w-full px-4 py-3 rounded-xl border border-neutral-200 focus:border-neutral-900 focus:outline-none text-sm transition-all bg-white"
                       />
                     </div>
