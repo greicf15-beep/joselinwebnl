@@ -84,7 +84,7 @@ export default function CheckoutModal({ plan, onClose, onPaymentSuccess }: Check
       }
       
       // Usar enlace de formulario limpio y universal
-      const shortAccessLink = `https://joselinnextlevel.com/formulario`;
+      const shortAccessLink = `https://joselinnextlevel.com/?form=1`;
 
       const waMessage = `¡Hola ${name}! Tu pago del plan ${plan.name} ha sido aprobado con éxito ✅. Aquí tienes tu enlace de acceso único para iniciar tu proceso: \n\n${shortAccessLink}`;
       const waUrl = `https://wa.me/${cleanWa}?text=${encodeURIComponent(waMessage)}`;
