@@ -1,12 +1,21 @@
 const fs = require('fs');
 let code = fs.readFileSync('server.ts', 'utf8');
 
-const regex = /    \/\/ Return error if no tokens are configured[\s\S]*?    orders\.set\(orderId, \{ status: 'pending', details \}\);/;
+const regex = /    \/\/ If no tokens are configured, simulate for development[\s\S]*?    orders\.set\(orderId, \{ status: 'pending', details \}\);/;
 
-const replacement = `    // Return error if no tokens are configured
+const replacement = `    // If no tokens are configured, simulate for development
     if (!telegramBotToken || !telegramChatId) {
-      console.error("No Telegram config found on server.");
-      return res.status(500).json({ error: "Telegram config missing" });
+      console.log("No Telegram config found on server. Simulating...");
+      orders.set(orderId, { status: 'pending', details });
+      
+      // Simulate an admin approving after 5 seconds
+      setTimeout(() => {
+        if (orders.has(orderId)) {
+          orders.get(orderId).status = 'approved';
+        }
+      }, 5000);
+      
+      return res.json({ success: true, simulated: true });
     }
 
     orders.set(orderId, { status: 'pending', details });`;
