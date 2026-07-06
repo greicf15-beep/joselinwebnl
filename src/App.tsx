@@ -24,9 +24,18 @@ export default function App() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const access = params.get('access');
-    if (access) {
+    const shortAccess = params.get('a');
+    
+    if (access || shortAccess) {
       try {
-        const decoded = JSON.parse(decodeURIComponent(atob(access)));
+        let decoded;
+        if (shortAccess) {
+          const arr = JSON.parse(decodeURIComponent(atob(shortAccess)));
+          decoded = { name: arr[0], email: arr[1], plan: arr[2] };
+        } else {
+          decoded = JSON.parse(decodeURIComponent(atob(access)));
+        }
+        
         if (decoded.name && decoded.email) {
           setPurchaseData({
             name: decoded.name,

@@ -72,11 +72,6 @@ export default function CheckoutModal({ plan, onClose, onPaymentSuccess }: Check
       const token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN || "8602916245:AAGqaY4oikBItzMOgGQ3TcHWz2bFOk5CMBA";
       const chatId = import.meta.env.VITE_TELEGRAM_CHAT_ID || "992461854";
       
-      const payload = btoa(encodeURIComponent(JSON.stringify({ name, email, plan: plan.name, method })));
-      const accessLink = `https://joselinnextlevel.com/?access=${payload}`;
-
-      const finalMessage = message + "\n\n----------------------------------\nPara aprobar y enviar el enlace de acceso al cliente, haz clic en el botón de abajo.";
-
       // Formatear el número de WhatsApp (asumimos Venezuela si empieza por 04)
       let cleanWa = whatsapp.replace(/\D/g,'');
       if (cleanWa.startsWith('0') && cleanWa.length === 11) {
@@ -85,15 +80,14 @@ export default function CheckoutModal({ plan, onClose, onPaymentSuccess }: Check
         cleanWa = '58' + cleanWa;
       }
       
-      const waMessage = `¡Hola ${name}! Tu pago del plan ${plan.name} ha sido aprobado con éxito ✅. Aquí tienes tu enlace de acceso único para iniciar tu proceso: \n\n${accessLink}`;
-      const waUrl = `https://api.whatsapp.com/send?phone=${cleanWa}&text=${encodeURIComponent(waMessage)}`;
-      const waFallbackUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(waMessage)}`;
+      // ACORTAMOS EL ENLACE PARA QUE NO FALLE TELEGRAM NI WHATSAPP
+      const shortPayload = btoa(encodeURIComponent(JSON.stringify([name, email, plan.name])));
+      const shortAccessLink = `https://joselinnextlevel.com/?a=${shortPayload}`;
 
-      const textWithLinks = finalMessage + 
-        "\n\n✅ *Opcion 1:* Enviar a " + cleanWa +
-        "\n" + waUrl +
-        "\n\n⚠️ *Opcion 2:* Si el enlace anterior da error (número inválido), usa este y selecciona el contacto manualmente:" +
-        "\n" + waFallbackUrl;
+      const waMessage = `¡Hola ${name}! Tu pago del plan ${plan.name} ha sido aprobado con éxito ✅. Aquí tienes tu enlace de acceso único para iniciar tu proceso: \n\n${shortAccessLink}`;
+      const waUrl = `https://wa.me/${cleanWa}?text=${encodeURIComponent(waMessage)}`;
+
+      const textWithLinks = message + "\n\nPara aprobar y enviar el enlace al cliente por WhatsApp, haz clic en el botón de abajo.";
 
       const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
         method: 'POST',
@@ -105,14 +99,8 @@ export default function CheckoutModal({ plan, onClose, onPaymentSuccess }: Check
             inline_keyboard: [
               [
                 {
-                  text: "✅ Enviar WhatsApp Directo",
+                  text: "✅ Aprobar y Enviar WhatsApp",
                   url: waUrl
-                }
-              ],
-              [
-                {
-                  text: "⚠️ Enviar Manual (si falla el directo)",
-                  url: waFallbackUrl
                 }
               ]
             ]
