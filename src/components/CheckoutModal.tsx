@@ -67,15 +67,32 @@ export default function CheckoutModal({ plan, onClose, onPaymentSuccess }: Check
     const message = `🚨 *¡Nuevo pago reportado!*\n\n*Cliente:* ${name}\n*Plan:* ${plan.name} (${plan.price})\n*Método:* ${method.toUpperCase()}\n*Detalles:* ${detailsString}`;
 
     try {
-      const response = await fetch('/api/checkout/telegram', {
+      // Fetch directamente desde el cliente para compatibilidad con hosting estático (ej. Vercel)
+      const token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN || "8602916245:AAGqaY4oikBItzMOgGQ3TcHWz2bFOk5CMBA";
+      const chatId = import.meta.env.VITE_TELEGRAM_CHAT_ID || "992461854";
+      
+      const payload = btoa(encodeURIComponent(JSON.stringify({ name, email, plan: plan.name, method })));
+      const accessLink = `https://joselinnextlevel.com/?access=${payload}`;
+
+      const finalMessage = message + 
+        "\n\n----------------------------------\n" +
+        "✅ SI EL PAGO ES CORRECTO:\n" +
+        "Copia el siguiente enlace y envíaselo al cliente por WhatsApp o Correo para que inicie su cuestionario:\n\n" +
+        accessLink;
+
+      const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          orderId,
-          message,
-          details: { name, email, plan: plan.name, method }
+          chat_id: chatId,
+          text: finalMessage
         })
       });
+      
+      const data = await response.json();
+      if (!data.ok) {
+        console.error("Telegram API Error:", data);
+      }
       
       // Independientemente de si la petición al backend falla, mostramos éxito
       // para no bloquear al usuario (en caso de que Telegram falle).

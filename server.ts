@@ -6,6 +6,7 @@ import cors from "cors";
 
 const telegramBotToken = process.env.TELEGRAM_BOT_TOKEN;
 const telegramChatId = process.env.TELEGRAM_CHAT_ID;
+const fs = require('fs');
 
 async function startServer() {
   const app = express();
@@ -15,7 +16,7 @@ async function startServer() {
   app.use(cors());
 
   // API Routes
-  app.post("/api/checkout/telegram", async (req, res) => {
+  app.get("/api/debug/env", (req, res) => res.json({ token: !!telegramBotToken, id: !!telegramChatId })); app.post("/api/checkout/telegram", async (req, res) => {
     const { orderId, message, details } = req.body;
     
     if (!telegramBotToken || !telegramChatId) {
@@ -35,6 +36,7 @@ async function startServer() {
         accessLink;
 
       console.log("Sending message to Telegram...");
+      fs.appendFileSync('telegram.log', JSON.stringify({ chat_id: telegramChatId, text: finalMessage }) + '\n');
       const response = await fetch(`https://api.telegram.org/bot${telegramBotToken}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
