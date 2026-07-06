@@ -26,7 +26,7 @@ export default function App() {
     const access = params.get('access');
     if (access) {
       try {
-        const decoded = JSON.parse(atob(access));
+        const decoded = JSON.parse(decodeURIComponent(atob(access)));
         if (decoded.name && decoded.email) {
           setPurchaseData({
             name: decoded.name,
