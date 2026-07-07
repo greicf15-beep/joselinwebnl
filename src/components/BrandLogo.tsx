@@ -15,7 +15,7 @@ export function JoselinLogoSymbol({ className = "w-8 h-8", color = "#9B655E" }: 
     <img 
       src="/logojoselin.png" 
       alt="Joselin Logo" 
-      className={className + " object-contain"} 
+      className={className + " object-contain" + (color === "white" ? " brightness-0 invert" : "")} 
     />
   );
 }

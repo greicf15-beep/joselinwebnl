@@ -131,7 +131,7 @@ export default function HeroSection({ onStartClick }: HeroSectionProps) {
                   id="floating-coach-badge"
                 >
                   <div className="w-8 h-8 rounded-full bg-[#E6A89E] flex items-center justify-center shrink-0">
-                    <JoselinLogoSymbol className="w-5 h-5" color="#30070C" />
+                    <JoselinLogoSymbol className="w-5 h-5" color="white" />
                   </div>
                   <div>
                     <span className="text-[10px] font-bold text-white block uppercase tracking-wider">Joselin Coach</span>

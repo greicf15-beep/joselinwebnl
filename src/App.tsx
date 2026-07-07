@@ -242,7 +242,7 @@ export default function App() {
 
           <div className="border-t border-neutral-800 mt-12 pt-8 flex flex-col sm:flex-row justify-between items-center text-[11px] sm:text-xs text-zinc-500 gap-4">
             <div>
-              Copyright © 2026 Joselin Next Level Training, Tu Poder - <a href="https://www.kromadesign.net/" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-white transition-colors">Diseñado por Kroma Design</a>
+              Copyright © 2026 Joselin Next Level Training - <a href="https://www.kromadesign.net/" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-white transition-colors">Diseñado por Kroma Design</a>
             </div>
           </div>
         </div>
