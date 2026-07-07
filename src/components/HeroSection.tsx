@@ -113,11 +113,13 @@ export default function HeroSection({ onStartClick }: HeroSectionProps) {
               {/* Master Trainer Photo with dynamic fallback */}
               <div className="relative w-full h-[400px] sm:h-[480px] lg:h-[98%] flex items-end justify-center z-10 px-0">
                 <img 
-                  src="/joselin_flex.png" 
+                  src="/joselinhome.webp" 
                   onError={(e) => {
                     const target = e.currentTarget;
                     const currentSrc = target.src || '';
-                    if (currentSrc.includes('/joselin_flex.png') && !currentSrc.includes('.png.png')) {
+                    if (currentSrc.includes('.webp')) {
+                      target.src = "/joselin_flex.png";
+                    } else if (currentSrc.includes('/joselin_flex.png') && !currentSrc.includes('.png.png')) {
                       target.src = "/joselin_flex.png.png";
                     } else if (currentSrc.includes('/joselin_flex.png.png')) {
                       target.src = "/assets/joselin_flex.png";

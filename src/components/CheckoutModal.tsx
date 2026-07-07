@@ -65,7 +65,13 @@ export default function CheckoutModal({ plan, onClose, onPaymentSuccess }: Check
     else if (method === 'pagomovil') detailsString = `Pago Móvil: Banco ${pmBank}, Ref ${pmReference}`;
     else if (method === 'paypal') detailsString = `PayPal: Correo Origen ${paypalEmail}, Ref ${paypalTxid}`;
 
-    const message = `🚨 *¡Nuevo pago reportado!*\n\n*Cliente:* ${name}\n*WhatsApp:* ${whatsapp}\n*Plan:* ${plan.name} (${plan.price})\n*Método:* ${method.toUpperCase()}\n*Detalles:* ${detailsString}`;
+    const message = `🚨 *¡Nuevo pago reportado!*
+
+*Cliente:* ${name}
+*WhatsApp:* ${whatsapp}
+*Plan:* ${plan.name} (${plan.price})
+*Método:* ${method.toUpperCase()}
+*Detalles:* ${detailsString}`;
 
     try {
       // Fetch directamente desde el cliente para compatibilidad con hosting estático (ej. Vercel)
@@ -84,7 +90,8 @@ export default function CheckoutModal({ plan, onClose, onPaymentSuccess }: Check
       }
       
       // Usar enlace de formulario limpio y universal
-      const shortAccessLink = `https://joselinnextlevel.com/?form=1`;
+      const shortPayload = btoa(encodeURIComponent(JSON.stringify([name, email, plan.name])));
+      const shortAccessLink = `https://joselinnextlevel.com/?a=${shortPayload}`;
 
       const waMessage = `¡Hola ${name}! Tu pago del plan ${plan.name} ha sido aprobado con éxito ✅. Aquí tienes tu enlace de acceso único para iniciar tu proceso: \n\n${shortAccessLink}`;
       const waUrl = `https://wa.me/${cleanWa}?text=${encodeURIComponent(waMessage)}`;
@@ -312,7 +319,8 @@ export default function CheckoutModal({ plan, onClose, onPaymentSuccess }: Check
                         placeholder="Tu Correo Electrónico"
                         className="w-full px-4 py-3 rounded-xl border border-neutral-200 focus:border-neutral-900 focus:outline-none text-sm transition-all bg-white"
                       />
-                    </div>\n                    <div className="sm:col-span-2">
+                    </div>
+                    <div className="sm:col-span-2">
                       <input 
                         type="tel" 
                         required

@@ -25,8 +25,8 @@ export default function QuestionnaireForm({ purchaseData }: QuestionnaireFormPro
     const phoneNumber = "584126851261"; // Reemplazar con el teléfono real
     const message = `🚨 *¡Nuevo formulario completado!*\n\n` +
       `*Datos de Compra:*\n` +
-      `- Cliente: ${purchaseData?.name || 'N/A'}\n` +
-      `- Email: ${purchaseData?.email || 'N/A'}\n` +
+      `- Cliente: ${name || purchaseData?.name || 'N/A'}\n` +
+      `- Email: ${email || purchaseData?.email || 'N/A'}\n` +
       `- Plan: ${purchaseData?.planName || 'N/A'}\n\n` +
       `*Datos Físicos:*\n` +
       `- Edad: ${age} años\n` +
