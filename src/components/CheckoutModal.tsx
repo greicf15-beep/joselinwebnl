@@ -518,7 +518,7 @@ export default function CheckoutModal({ plan, onClose, onPaymentSuccess }: Check
                     Siguiente paso:
                   </p>
                   <p className="text-orange-800 text-sm leading-relaxed">
-                    nuestro equipo de soporte validará tu transferencia a la brevedad posible. Una vez aprobada, recibirás tu <b>enlace de acceso único</b> por WhatsApp o Correo para iniciar tu proceso.
+                    Nuestro equipo de soporte validará tu transferencia a la brevedad posible. Una vez aprobada, recibirás tu <b>enlace de acceso único</b> por WhatsApp o Correo para iniciar tu proceso.
                   </p>
                 </div>
                 <button
