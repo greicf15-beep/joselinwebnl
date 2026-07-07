@@ -112,27 +112,31 @@ export default function HeroSection({ onStartClick }: HeroSectionProps) {
 
               {/* Master Trainer Photo with dynamic fallback */}
               <div className="relative w-full h-[400px] sm:h-[480px] lg:h-[98%] flex items-end justify-center z-10 px-0">
-                <img 
-                  src="/joselin_flex.webp" 
-                  onError={(e) => {
-                    const target = e.currentTarget;
-                    const currentSrc = target.src || '';
-                    if (currentSrc.includes('.webp')) {
-                      target.src = "/joselin_flex.png";
-                    } else if (currentSrc.includes('/joselin_flex.png') && !currentSrc.includes('.png.png')) {
-                      target.src = "/joselin_flex.png.png";
-                    } else if (currentSrc.includes('/joselin_flex.png.png')) {
-                      target.src = "/assets/joselin_flex.png";
-                    } else {
-                      target.src = "https://images.unsplash.com/photo-1594381898411-846e7d193883?q=80&w=1000";
-                    }
-                  }}
-                  alt="Joselin Personal Trainer Crouch" 
-                  className="-mb-[185px] sm:-mb-[14px] translate-y-[40px] sm:translate-y-0 max-h-[120%] sm:max-h-[105%] max-w-[110%] sm:max-w-[100%] lg:max-h-full lg:max-w-full object-contain select-none filter drop-shadow-[0_20px_50px_rgba(230,168,158,0.25)] transition-all duration-700 scale-[1.25] sm:scale-110 lg:scale-102 hover:scale-[1.3] sm:hover:scale-115 lg:hover:scale-105 origin-bottom"
-                  style={{ paddingLeft: '0px', paddingTop: 0, paddingBottom: 140, marginTop: '0px', marginRight: '0px' }}
-                  referrerPolicy="no-referrer"
-                  id="hero-trainer-silhouette"
-                />
+                <picture className="w-full h-full flex justify-center items-end relative z-10">
+                  <source media="(min-width: 1024px)" srcSet="/joselin_flex.webp" />
+                  <source media="(min-width: 640px)" srcSet="/joselinhome.webp" />
+                  <img 
+                    src="/joselin_flex.webp" 
+                    onError={(e) => {
+                      const target = e.currentTarget;
+                      const currentSrc = target.src || '';
+                      if (currentSrc.includes('.webp')) {
+                        target.src = "/joselin_flex.png";
+                      } else if (currentSrc.includes('/joselin_flex.png') && !currentSrc.includes('.png.png')) {
+                        target.src = "/joselin_flex.png.png";
+                      } else if (currentSrc.includes('/joselin_flex.png.png')) {
+                        target.src = "/assets/joselin_flex.png";
+                      } else {
+                        target.src = "https://images.unsplash.com/photo-1594381898411-846e7d193883?q=80&w=1000";
+                      }
+                    }}
+                    alt="Joselin Personal Trainer Crouch" 
+                    className="-mb-[185px] sm:-mb-[14px] translate-y-[40px] sm:translate-y-0 max-h-[120%] sm:max-h-[105%] max-w-[110%] sm:max-w-[100%] lg:max-h-full lg:max-w-full object-contain select-none filter drop-shadow-[0_20px_50px_rgba(230,168,158,0.25)] transition-all duration-700 scale-[1.25] sm:scale-110 lg:scale-102 hover:scale-[1.3] sm:hover:scale-115 lg:hover:scale-105 origin-bottom"
+                    style={{ paddingLeft: '0px', paddingTop: 0, paddingBottom: 140, marginTop: '0px', marginRight: '0px' }}
+                    referrerPolicy="no-referrer"
+                    id="hero-trainer-silhouette"
+                  />
+                </picture>
 
                 {/* Floating Glassmorphism Badge */}
                 <div 
