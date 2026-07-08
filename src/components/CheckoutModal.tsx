@@ -217,9 +217,9 @@ export default function CheckoutModal({ plan, onClose, onPaymentSuccess }: Check
                         <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
                           <div>
                             <p className="text-[10px] uppercase tracking-widest text-neutral-400 font-bold mb-1">Correo Zelle</p>
-                            <p className="font-mono text-sm sm:text-base font-semibold text-neutral-800">7869718364</p>
+                            <p className="font-mono text-sm sm:text-base font-semibold text-neutral-800">acueto_25@hotmail.com</p>
                           </div>
-                          {handleCopyBtn('7869718364', 'zelle-email')}
+                          {handleCopyBtn('acueto_25@hotmail.com', 'zelle-email')}
                         </div>
                         <div className="flex items-center justify-between">
                           <div>
@@ -419,14 +419,17 @@ export default function CheckoutModal({ plan, onClose, onPaymentSuccess }: Check
                       </>
                     )}
                     
-                    {/* Optional Screenshot */}
+                    {/* Mandatory Screenshot */}
                     <div className="sm:col-span-2">
-                      <label className="flex items-center justify-center w-full px-4 py-4 border-2 border-dashed border-neutral-300 rounded-xl cursor-pointer hover:bg-neutral-100 transition-colors bg-white">
-                        <div className="flex items-center gap-2 text-neutral-500">
+                      <label className="flex flex-col items-center justify-center w-full px-4 py-4 border-2 border-dashed border-neutral-400 rounded-xl cursor-pointer hover:bg-neutral-50 transition-colors bg-white">
+                        <div className="flex items-center gap-2 text-neutral-700 mb-1">
                           <ImageIcon className="w-5 h-5" />
-                          <span className="text-sm font-medium">Subir captura del pago (Opcional)</span>
+                          <span className="text-sm font-bold">Subir captura del pago (Obligatorio)</span>
                         </div>
-                        <input type="file" accept="image/*" className="hidden" />
+                        <p className="text-[11px] text-[#30070C] text-center font-medium mt-1">
+                          * No puede haber verificación sin la captura del pago
+                        </p>
+                        <input type="file" accept="image/*" className="hidden" required />
                       </label>
                     </div>
                   </div>

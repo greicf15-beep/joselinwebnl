@@ -57,24 +57,15 @@ export default function AboutSection() {
               <div className="absolute -inset-2 bg-[#9B655E]/10 rounded-[2.8rem] rotate-2" />
               
               <div className="relative w-full h-full bg-[#30070C] rounded-[2.5rem] p-1.5 overflow-hidden shadow-2xl border-2 border-stone-200">
-                <img 
-                  src="/joselin_box.png" 
-                  onError={(e) => {
-                    const target = e.currentTarget;
-                    const currentSrc = target.src || '';
-                    if (currentSrc.includes('/joselin_box.png') && !currentSrc.includes('.png.png')) {
-                      target.src = "/joselin_box.png.png";
-                    } else if (currentSrc.includes('/joselin_box.png.png')) {
-                      target.src = "/assets/joselin_box.png";
-                    } else {
-                      target.src = "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=1000";
-                    }
-                  }}
-                  alt="Joselin Coach de Recomposición Femenina - Box Kneel pose" 
-                  className="w-full h-full object-cover rounded-[2.3rem] hover:scale-105 transition-transform duration-700 select-none"
-                  referrerPolicy="no-referrer"
-                  id="about-coach-img"
-                />
+                <div className="w-full h-full rounded-[2.3rem] overflow-hidden">
+                  <img 
+                    src="/joselinquiensoy.webp" 
+                    alt="Joselin Coach de Recomposición Femenina - Box Kneel pose" 
+                    className="w-full h-full object-cover object-[85%_top] scale-[1.15] sm:scale-[1.25] translate-y-8 sm:translate-y-12 hover:scale-[1.20] sm:hover:scale-[1.30] transition-transform duration-700 select-none"
+                    referrerPolicy="no-referrer"
+                    id="about-coach-img"
+                  />
+                </div>
               </div>
 
               {/* Heart Stamp Badge celebrating her workout passion */}
