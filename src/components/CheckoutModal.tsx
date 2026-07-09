@@ -28,7 +28,9 @@ export default function CheckoutModal({ plan, onClose, onPaymentSuccess }: Check
 
   const [copiedField, setCopiedField] = useState<string | null>(null);
   
-  const [status, setStatus] = useState<'editing' | 'processing' | 'success' | 'submitted'>('editing');
+    const [screenshot, setScreenshot] = useState<File | null>(null);
+  const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null);
+const [status, setStatus] = useState<'editing' | 'processing' | 'success' | 'submitted'>('editing');
 
   // Helper to copy text
   const copyToClipboard = (text: string, fieldId: string) => {
@@ -98,12 +100,34 @@ export default function CheckoutModal({ plan, onClose, onPaymentSuccess }: Check
 
       const textWithLinks = message + "\n\nPara aprobar y enviar el enlace al cliente por WhatsApp, haz clic en el botón de abajo.";
 
-      const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      let endpoint = `https://api.telegram.org/bot${token}/sendMessage`;
+      let payload: any;
+      let fetchOptions: RequestInit = { method: 'POST' };
+      
+      if (screenshot) {
+        endpoint = `https://api.telegram.org/bot${token}/sendPhoto`;
+        payload = new FormData();
+        payload.append('chat_id', chatId);
+        payload.append('photo', screenshot);
+        payload.append('caption', textWithLinks);
+        payload.append('parse_mode', 'Markdown');
+        payload.append('reply_markup', JSON.stringify({
+          inline_keyboard: [
+            [
+              {
+                text: "✅ Aprobar y Enviar WhatsApp",
+                url: waUrl
+              }
+            ]
+          ]
+        }));
+        fetchOptions.body = payload;
+      } else {
+        fetchOptions.headers = { 'Content-Type': 'application/json' };
+        fetchOptions.body = JSON.stringify({
           chat_id: chatId,
           text: textWithLinks,
+          parse_mode: 'Markdown',
           reply_markup: {
             inline_keyboard: [
               [
@@ -114,8 +138,10 @@ export default function CheckoutModal({ plan, onClose, onPaymentSuccess }: Check
               ]
             ]
           }
-        })
-      });
+        });
+      }
+
+      const response = await fetch(endpoint, fetchOptions);
       
       const data = await response.json();
       if (!data.ok) {
@@ -421,15 +447,37 @@ export default function CheckoutModal({ plan, onClose, onPaymentSuccess }: Check
                     
                     {/* Mandatory Screenshot */}
                     <div className="sm:col-span-2">
-                      <label className="flex flex-col items-center justify-center w-full px-4 py-4 border-2 border-dashed border-neutral-400 rounded-xl cursor-pointer hover:bg-neutral-50 transition-colors bg-white">
-                        <div className="flex items-center gap-2 text-neutral-700 mb-1">
-                          <ImageIcon className="w-5 h-5" />
-                          <span className="text-sm font-bold">Subir captura del pago (Obligatorio)</span>
-                        </div>
-                        <p className="text-[11px] text-[#30070C] text-center font-medium mt-1">
-                          * No puede haber verificación sin la captura del pago
-                        </p>
-                        <input type="file" accept="image/*" className="hidden" required />
+                      <label className="flex flex-col items-center justify-center w-full px-4 py-4 border-2 border-dashed border-neutral-400 rounded-xl cursor-pointer hover:bg-neutral-50 transition-colors bg-white overflow-hidden relative">
+                        {screenshotPreview ? (
+                          <div className="relative w-full h-40 flex items-center justify-center bg-black/5 rounded-lg overflow-hidden">
+                            <img src={screenshotPreview} alt="Screenshot Preview" className="max-w-full max-h-full object-contain" />
+                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                              <span className="text-white text-xs font-bold bg-black/50 px-3 py-1.5 rounded-full">Cambiar imagen</span>
+                            </div>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="flex items-center gap-2 text-neutral-700 mb-1">
+                              <ImageIcon className="w-5 h-5" />
+                              <span className="text-sm font-bold">Subir captura del pago (Obligatorio)</span>
+                            </div>
+                            <p className="text-[11px] text-[#30070C] text-center font-medium mt-1">
+                              * No puede haber verificación sin la captura del pago
+                            </p>
+                          </>
+                        )}
+                        <input 
+                          type="file" 
+                          accept="image/*" 
+                          className="hidden" 
+                          required 
+                          onChange={(e) => {
+                            if (e.target.files && e.target.files[0]) {
+                              setScreenshot(e.target.files[0]);
+                              setScreenshotPreview(URL.createObjectURL(e.target.files[0]));
+                            }
+                          }}
+                        />
                       </label>
                     </div>
                   </div>
