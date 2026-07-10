@@ -70,11 +70,7 @@ async function startServer() {
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
     app.get('*all', (req, res) => {
-      if (req.path.startsWith('/formulario')) {
-        res.sendFile(path.join(distPath, 'formulario/index.html'));
-      } else {
-        res.sendFile(path.join(distPath, 'index.html'));
-      }
+      res.sendFile(path.join(distPath, 'index.html'));
     });
   }
 
