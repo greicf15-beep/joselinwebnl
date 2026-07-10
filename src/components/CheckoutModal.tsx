@@ -92,8 +92,7 @@ const [status, setStatus] = useState<'editing' | 'processing' | 'success' | 'sub
       }
       
       // Usar enlace de formulario limpio y universal
-      const shortPayload = btoa(encodeURIComponent(JSON.stringify([name, email, plan.name])));
-      const shortAccessLink = `https://joselinnextlevel.com/?a=${shortPayload}`;
+      const shortAccessLink = `https://joselinnextlevel.com/formulario?p=${btoa(encodeURIComponent(plan.name))}`;
 
       const waMessage = `¡Hola ${name}! Tu pago del plan ${plan.name} ha sido aprobado con éxito ✅. Aquí tienes tu enlace de acceso único para iniciar tu proceso: \n\n${shortAccessLink}`;
       const waUrl = `https://wa.me/${cleanWa}?text=${encodeURIComponent(waMessage)}`;
@@ -147,6 +146,8 @@ const [status, setStatus] = useState<'editing' | 'processing' | 'success' | 'sub
       if (!data.ok) {
         console.error("Telegram API Error:", data);
       }
+
+      
       
       // Independientemente de si la petición al backend falla, mostramos éxito
       // para no bloquear al usuario (en caso de que Telegram falle).

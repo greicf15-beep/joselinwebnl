@@ -26,8 +26,7 @@ async function startServer() {
 
     try {
       // Generar link de acceso
-      const payload = Buffer.from(JSON.stringify(details)).toString('base64');
-      const accessLink = `https://joselinnextlevel.com/?access=${payload}`;
+      const accessLink = `https://joselinnextlevel.com/formulario?p=${Buffer.from(encodeURIComponent(details.planName || 'Plan')).toString('base64')}`;
 
       const finalMessage = message + 
         "\n\n----------------------------------\n" +

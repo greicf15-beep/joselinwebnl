@@ -22,15 +22,11 @@ export default function App() {
 
   // Check for access token in URL (from Joselin's approval link)
   useEffect(() => {
-    // Si la URL tiene /formulario, mostramos el cuestionario directamente
-    if (window.location.pathname.startsWith('/formulario') || window.location.search.includes('form=')) {
-      setView('questionnaire');
-      return;
-    }
-
     const params = new URLSearchParams(window.location.search);
     const access = params.get('access');
     const shortAccess = params.get('a');
+    const planParam = params.get('p');
+    let shouldShowQuestionnaire = window.location.pathname.startsWith('/formulario') || window.location.search.includes('form=');
     
     if (access || shortAccess) {
       try {
@@ -42,7 +38,7 @@ export default function App() {
           decoded = JSON.parse(decodeURIComponent(atob(access)));
         }
         
-        if (decoded.name && decoded.email) {
+        if (decoded && decoded.name && decoded.email) {
           setPurchaseData({
             name: decoded.name,
             email: decoded.email,
@@ -51,14 +47,29 @@ export default function App() {
           });
           setHasPaid(true);
           setPurchasedEmail(decoded.email);
-          setView('questionnaire');
-          
-          // Clean the URL without reloading the page
-          window.history.replaceState({}, document.title, window.location.pathname);
+          shouldShowQuestionnaire = true;
         }
       } catch (e) {
         console.error("Invalid access token");
       }
+    } else if (planParam) {
+      try {
+        const decodedPlan = decodeURIComponent(atob(planParam));
+        setPurchaseData({
+          name: '',
+          email: '',
+          planName: decodedPlan,
+          total: ''
+        });
+        shouldShowQuestionnaire = true;
+      } catch (e) {
+        console.error("Invalid plan token");
+      }
+    }
+    
+    if (shouldShowQuestionnaire) {
+      setView('questionnaire');
+      window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, []);
   
