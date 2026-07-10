@@ -91,7 +91,7 @@ export default function QuestionnaireForm({ purchaseData }: QuestionnaireFormPro
           </div>
 
           <form onSubmit={handleSubmit} className="p-8 space-y-8">
-            {!purchaseData && (
+            {(!purchaseData || !purchaseData.name || !purchaseData.email) && (
               <div className="space-y-4">
                 <h3 className="text-sm font-bold uppercase tracking-widest text-neutral-800 flex items-center gap-2">
                   <User className="w-4 h-4 text-[#E6A89E]" />
