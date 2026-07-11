@@ -22,7 +22,7 @@ export default function QuestionnaireForm({ purchaseData }: QuestionnaireFormPro
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const phoneNumber = "584126851261"; // Reemplazar con el teléfono real
+    const phoneNumber = "584149696006"; // Reemplazar con el teléfono real
     const message = `🚨 *¡Nuevo formulario completado!*\n\n` +
       `*Datos de Compra:*\n` +
       `- Cliente: ${name || purchaseData?.name || 'N/A'}\n` +
@@ -62,7 +62,7 @@ export default function QuestionnaireForm({ purchaseData }: QuestionnaireFormPro
             Si no se abrió la ventana de WhatsApp automáticamente, haz clic en el botón de abajo para enviarle tus datos a Joselin.
           </p>
           <button
-            onClick={() => window.open(`https://wa.me/584126851261`, '_blank', 'noopener,noreferrer')}
+            onClick={() => window.open(`https://wa.me/584149696006`, '_blank', 'noopener,noreferrer')}
             className="w-full bg-neutral-900 hover:bg-black text-white font-bold py-4 rounded-xl shadow-lg transition-all"
           >
             Abrir WhatsApp Manualmente

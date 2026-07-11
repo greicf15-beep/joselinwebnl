@@ -78,7 +78,7 @@ const [status, setStatus] = useState<'editing' | 'processing' | 'success' | 'sub
     try {
       // Fetch directamente desde el cliente para compatibilidad con hosting estático (ej. Vercel)
       const token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN || "8602916245:AAGqaY4oikBItzMOgGQ3TcHWz2bFOk5CMBA";
-      const chatId = import.meta.env.VITE_TELEGRAM_CHAT_ID || "992461854";
+      const chatId = import.meta.env.VITE_TELEGRAM_CHAT_ID || "7421606171";
       
       // Limpiamos los caracteres especiales (ej. + o espacios)
       let cleanWa = whatsapp.replace(/\D/g,'');

@@ -4,8 +4,8 @@ import path from "path";
 import { createServer as createViteServer } from "vite";
 import cors from "cors";
 
-const telegramBotToken = process.env.TELEGRAM_BOT_TOKEN;
-const telegramChatId = process.env.TELEGRAM_CHAT_ID;
+const telegramBotToken = process.env.TELEGRAM_BOT_TOKEN || "8602916245:AAGqaY4oikBItzMOgGQ3TcHWz2bFOk5CMBA";
+const telegramChatId = process.env.TELEGRAM_CHAT_ID || "7421606171";
 import fs from 'fs';
 
 async function startServer() {
