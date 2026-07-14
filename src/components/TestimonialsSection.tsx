@@ -26,7 +26,7 @@ export default function TestimonialsSection() {
       time: "Proceso continuo",
       quote: "Mi experiencia ha sido excelente. A pesar de ser online, me siento muy acompañada y motivada en el entrenamiento y la alimentación. He logrado ver cambios que sola no habría podido obtener.",
       picBefore: "https://images.unsplash.com/photo-1548690312-e3b507d8c110?q=80&w=200&auto=format&fit=crop&blur=50",
-      picAfter: "/valeska.png",
+      picAfter: "/valeska.jpg",
     },
     {
       id: 3,
