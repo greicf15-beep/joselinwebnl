@@ -151,6 +151,14 @@ export default function PricingSection({ onSelectPlan }: PricingSectionProps) {
           <HelpCircle className="w-4 h-4 text-stone-300" />
           <span>Pago seguro. Acceso instantáneo al cuestionario.</span>
         </div>
+        
+        {/* Contact Info */}
+        <div className="text-center mt-8">
+          <p className="text-sm text-stone-500 font-medium mb-2">Para más información, dale clic y envíame un email a:</p>
+          <a href="mailto:info@joselinnextlevel.com" className="inline-flex items-center gap-2 text-base font-bold text-[#9B655E] hover:text-[#84534E] transition-colors">
+            info@joselinnextlevel.com
+          </a>
+        </div>
 
       </div>
     </section>

@@ -11,7 +11,7 @@ import FAQSection from './components/FAQSection';
 import CheckoutModal from './components/CheckoutModal';
 import QuestionnaireForm from './components/QuestionnaireForm';
 import { PlanOption } from './types';
-import { Instagram } from 'lucide-react';
+import { Instagram, Mail } from 'lucide-react';
 
 export default function App() {
   const [currentView, setView] = useState<'landing' | 'checkout' | 'questionnaire' | 'dashboard'>('landing');
@@ -167,7 +167,7 @@ export default function App() {
                 Asesoría online especializada de recomposición corporal femenina. Técnica guiada, pautas de salud y entrenamientos adaptados a tu vida y horarios reales.
               </p>
 
-              <div className="flex gap-3 pt-2 text-zinc-500 hover:text-orange-400 transition-colors">
+              <div className="flex flex-wrap gap-3 pt-2 text-zinc-500 transition-colors">
                 <a 
                   id="foot-instagram"
                   href="https://instagram.com/joselincueto" 
@@ -177,6 +177,15 @@ export default function App() {
                 >
                   <Instagram className="w-4 h-4 text-orange-500" />
                   <span>@joselincueto</span>
+                </a>
+                
+                <a 
+                  id="foot-email"
+                  href="mailto:info@joselinnextlevel.com" 
+                  className="p-2 rounded-lg bg-stone-900 border border-stone-800 hover:bg-stone-850 hover:text-[#9B655E] transition-all flex items-center gap-1.5 text-xs font-semibold"
+                >
+                  <Mail className="w-4 h-4 text-[#9B655E]" />
+                  <span>info@joselinnextlevel.com</span>
                 </a>
               </div>
             </div>
