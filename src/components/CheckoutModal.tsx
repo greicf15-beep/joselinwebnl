@@ -182,7 +182,19 @@ const [status, setStatus] = useState<'editing' | 'processing' | 'success' | 'sub
         <div className="bg-[#30070C] p-6 text-white text-center relative flex justify-between items-center">
           <div>
              <h3 className="font-display font-black text-xl tracking-tight text-left">Confirmar Compra</h3>
-             <p className="text-xs text-neutral-400 font-medium tracking-wide uppercase mt-1 text-left">{plan.name} — {plan.price}</p>
+             <div className="flex items-center gap-2 mt-1 text-xs text-neutral-400 font-medium tracking-wide uppercase text-left flex-wrap">
+               <span>{plan.name}</span>
+               <span>—</span>
+               <span className="text-white font-bold">{plan.price}</span>
+               {plan.originalPrice && (
+                 <span className="line-through text-neutral-400 text-[11px]">{plan.originalPrice}</span>
+               )}
+               {plan.discountBadge && (
+                 <span className="bg-[#9B655E] text-white text-[9px] font-bold px-1.5 py-0.5 rounded uppercase">
+                   {plan.discountBadge}
+                 </span>
+               )}
+             </div>
           </div>
           <button 
             id="checkout-close"

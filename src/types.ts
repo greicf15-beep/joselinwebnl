@@ -53,6 +53,8 @@ export interface PlanOption {
   id: string;
   name: string;
   price: string;
+  originalPrice?: string;
+  discountBadge?: string;
   period: string;
   tagline: string;
   isPopular: boolean;

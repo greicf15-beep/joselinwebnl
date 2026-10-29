@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { Check, Star, HelpCircle } from 'lucide-react';
+import { Check, Star, HelpCircle, Sparkles, Tag } from 'lucide-react';
 import { PlanOption } from '../types';
 
 interface PricingSectionProps {
@@ -11,7 +11,9 @@ export default function PricingSection({ onSelectPlan }: PricingSectionProps) {
     {
       id: "esencial",
       name: "Esencial: Fit Start",
-      price: "$50",
+      price: "$30",
+      originalPrice: "$50",
+      discountBadge: "-40% PROMO",
       period: "Por mes",
       tagline: "Tu estructura de éxito. Ideal para romper estancamientos.",
       isPopular: false,
@@ -26,7 +28,9 @@ export default function PricingSection({ onSelectPlan }: PricingSectionProps) {
     {
       id: "premium",
       name: "Premium: Total Transformation",
-      price: "$80",
+      price: "$60",
+      originalPrice: "$80",
+      discountBadge: "-25% PROMO",
       period: "Por mes",
       tagline: "Acompañamiento estricto y personalización máxima.",
       isPopular: true,
@@ -42,7 +46,9 @@ export default function PricingSection({ onSelectPlan }: PricingSectionProps) {
     {
       id: "vip",
       name: "VIP: Next Level Coached",
-      price: "$120",
+      price: "$90",
+      originalPrice: "$120",
+      discountBadge: "-25% PROMO",
       period: "Por mes (Cupos limitados)",
       tagline: "Máxima exclusividad. Enfoque 360° de alta gama.",
       isPopular: false,
@@ -62,12 +68,15 @@ export default function PricingSection({ onSelectPlan }: PricingSectionProps) {
         
         {/* Section Heading */}
         <div className="text-center md:max-w-xl mx-auto space-y-4 mb-20">
-          <span className="text-[#9B655E] font-mono text-xs uppercase tracking-widest font-bold block">• INVERSIÓN EN TI MISMA •</span>
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#9B655E]/10 border border-[#9B655E]/20 text-[#9B655E] text-xs font-mono font-bold uppercase tracking-widest">
+            <Sparkles className="w-3.5 h-3.5 text-[#9B655E]" />
+            <span>Promo Especial Activa</span>
+          </div>
           <h2 className="text-3xl sm:text-5xl font-display font-medium uppercase tracking-tight text-[#30070C]" id="pricing-heading">
             ELIGE EL CAMINO A TU BIENESTAR
           </h2>
           <p className="text-stone-500 text-sm leading-relaxed font-sans">
-            Sin contratos forzosos. Cancela o detén tu suscripción cuando quieras. Al realizar el pago, obtendrás acceso inmediato a tu cuestionario individualizado.
+            Aprovecha nuestros precios promocionales especiales con descuento por tiempo limitado. Sin contratos forzosos. Cancela o detén tu suscripción cuando quieras. Al realizar el pago, obtendrás acceso inmediato a tu cuestionario individualizado.
           </p>
         </div>
 
@@ -106,13 +115,36 @@ export default function PricingSection({ onSelectPlan }: PricingSectionProps) {
                   </p>
                 </div>
 
-                <div className="flex items-baseline gap-1.5 mb-8 border-b border-stone-100 pb-6">
-                  <span className="text-4xl sm:text-5xl font-display font-bold text-[#30070C]">
-                    {plan.price}
-                  </span>
-                  <span className="text-xs text-stone-500 font-medium font-mono uppercase tracking-wider">
-                    / {plan.period}
-                  </span>
+                {/* Price block: Antes vs Ahora Promo */}
+                <div className="mb-8 border-b border-stone-100 pb-6">
+                  {plan.originalPrice && (
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-[11px] font-mono uppercase tracking-wider text-stone-400 font-semibold">
+                        Antes
+                      </span>
+                      <span className="text-base sm:text-lg font-display font-semibold text-stone-400 line-through">
+                        {plan.originalPrice}
+                      </span>
+                      {plan.discountBadge && (
+                        <span className="inline-flex items-center gap-1 bg-[#9B655E]/15 text-[#9B655E] text-[10px] font-mono font-bold px-2 py-0.5 rounded-full uppercase tracking-wider border border-[#9B655E]/20">
+                          <Tag className="w-2.5 h-2.5" />
+                          {plan.discountBadge}
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-xs font-mono font-bold uppercase text-[#9B655E] tracking-wider">
+                      Ahora
+                    </span>
+                    <span className="text-4xl sm:text-5xl font-display font-bold text-[#30070C]">
+                      {plan.price}
+                    </span>
+                    <span className="text-xs text-stone-500 font-medium font-mono uppercase tracking-wider">
+                      / {plan.period}
+                    </span>
+                  </div>
                 </div>
 
                 {/* Features Checklist */}
